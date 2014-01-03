@@ -1,11 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.phonegap.helloworld" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
-    <name>HelloWorld</name>
+<widget id="com.changos.guiame" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+    <name>GuiaMe</name>
     <description>
-        Hello World sample application that responds to the deviceready event.
+        GuiaMe aplciacion mobile para mostrar rutas, recorridos de servicios de transporte, locales y servicios de argentina
     </description>
     <author email="support@phonegap.com" href="http://phonegap.com">
-        PhoneGap Team
+        GuiaMe Team
+        David Rearte        @dengue8830
+        Jorge Riera         @nigrobyte
     </author>
     <feature name="http://api.phonegap.com/1.0/device" />
     <preference name="permissions" value="none" />

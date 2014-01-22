@@ -10,44 +10,72 @@
     <script src="js/jquery-1.10.2.min.js"></script>
     <script src="js/jquery.mobile-1.4.0.min.js"></script>
     
-     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
+    <!--<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=drawing&sensor=true"></script>-->
+<script src="js/controller/trazaController.js"></script>
+<script src="js/connection/connection.js"></script>
 <script type="text/javascript">
 var map;
 
-window.onload = function() {
+function initialize() {
 
   if(navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
         //console.log(position.coords.latitude+', '+position.coords.longitude);
+        //Estableciendo opciones
+        var posicionActual = new google.maps.LatLng(position.coords.latitude,
+                                       position.coords.longitude);
         var mapOptions = {
-            zoom: 8
-            , center: new google.maps.LatLng(position.coords.latitude,
-                                       position.coords.longitude)
-            , mapTypeId: google.maps.MapTypeId.ONROAD
+            zoom: 15,
+            center: posicionActual,
+            mapTypeId: google.maps.MapTypeId.ONROAD
         };
 
+        //Dibujando mapa
         map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
+        placeMarker(posicionActual, map);
+        //Dibujando linea de recorrido
+        /*google.maps.event.addListener(map, 'click', function(e) {
+          
+          console.log(recorrido);
+          recorrido.push(new google.maps.LatLng(e.latLng.lat(), e.latLng.lng()));
+          var linea = new google.maps.Polyline({
+            path: recorrido,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+          });
+
+          linea.setMap(map);
+        });*/
+
     }, function() {
-      handleNoGeolocation(true);
+      alert('Error: El servicio de geolocalización no funciona.');
     },
     { maximumAge: 3000, timeout: 5000, enableHighAccuracy: true});
   } else {
     // Browser doesn't support Geolocation
-    handleNoGeolocation(false);
+    alert('Error: Tu navegador no soporta geolocalización.');
   }
 }
 
-function handleNoGeolocation(errorFlag) {
-  if (errorFlag) {
-    var err = 'Error: El servicio de geolocalización no funciona.';
-  } else {
-    var err = 'Error: Tu navegador no soporta geolocalización.';
-  }
-
-  alert(err);
+function placeMarker(position, map) {
+  var marker = new google.maps.Marker({
+    position: position,
+    map: map
+  });
+  map.panTo(position);
+  return marker;
 }
 
+google.maps.event.addDomListener(window, 'load', initialize);
+
+//BD
+var db = window.openDatabase("GuiameDB", "1.0", "GuiameBD", 200000);
+//ejecutar('UPDATE lineas_transporte SET recorrido = null, paradas = null where id_linea_transporte = 1')
+connection_cargarBD(null, connection_createTables);
 </script>
 </head>
 <body>
@@ -56,7 +84,7 @@ function handleNoGeolocation(errorFlag) {
     <div data-role="header" data-theme="a" >
         <h3> Guiame</h3>
 
-        <a href="#" class="ui-btn ui-icon-search ui-btn-icon-notext ui-corner-all" data-role="button">Buscar</a>
+        <a href="#pageTrazar" onclick="controller_traza_cargarMapaTraza();" class="ui-btn ui-icon-search ui-btn-icon-notext ui-corner-all" data-role="button">Buscar</a>
         <a href="#" class="ui-btn ui-icon-cloud ui-btn-icon-notext ui-corner-all" data-theme="b">Buscar</a>
     <div data-role="navbar"></div>          
                 
@@ -78,6 +106,39 @@ function handleNoGeolocation(errorFlag) {
             
     </div>
 </div>
+<div data-role="page" data-theme="a" id="pageTrazar">
+    <!-- cabecera -->
+    <div data-role="header" data-theme="a" >
+        <h3> Guiame</h3>
 
+        <a href="#" class="ui-btn ui-icon-search ui-btn-icon-notext ui-corner-all" data-role="button">Buscar</a>
+        <a href="#page" class="ui-btn ui-icon-cloud ui-btn-icon-notext ui-corner-all" data-theme="b">Buscar</a>
+    <div data-role="navbar"></div>          
+                
+                
+    </div>
+    <!-- content -->
+    <div data-role="content" id="contenedorTraza">
+        
+         <div id="mapTraza" style="width:300px;height:300px"></div>
+    </div>
+    <div>
+      <input type="button" value="trazar recorrido" onclick="controller_traza_trazarRecorrido();">
+      <input type="button" value="trazar parada" onclick="controller_traza_trazarParada();">
+      <input type="button" value="guardar" onclick="controller_traza_guardar();">
+      <select name="lineas" id="selectLineas" onchange="controller_traza_cargar();">
+      </select>
+    </div>
+    <!-- footer -->
+    <div data-role="footer" data-position="fixed">
+        
+        <!-- <div data-role="controlgroup" data-type="horizontal"> -->
+            <a href="#" data-role="button" class="ui-btn ui-icon-arrow-l ui-btn-icon-notext ui-corner-all" id="restar_dia" onclick="controller_mostrarSorteos_modificarFecha('menos');"></a>
+            <a href="#" data-role="button" data-icon="calendar" id="calendario"></a>
+            <a href="#" data-role="button" class="ui-btn ui-icon-arrow-r ui-btn-icon-notext ui-corner-all" id="aumentar_dia" onclick="controller_mostrarSorteos_modificarFecha('mas');"></a>
+        <!-- </div> -->
+            
+    </div>
+</div>
 </body>
 </html>
